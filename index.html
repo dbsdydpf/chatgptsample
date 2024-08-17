@@ -114,7 +114,8 @@
             const roundness = parseFloat(document.getElementById("roundness-input").value);
 
             const ctx = document.getElementById("plot").getContext("2d");
-            ctx.clearRect(0, 0, 500, 500);
+            drawGrid(ctx);
+
             ctx.beginPath();
 
             const equation = getHeartEquation(width, height, slimness, roundness);
@@ -129,12 +130,34 @@
 
             document.getElementById("equation-output").innerHTML = `
                 <strong>Heart Equation:</strong><br>
-                x(t) = ${width} * 16 * sin(t)<sup>3</sup> * ${slimness}<br>
-                y(t) = ${height} * [13 * cos(t) - 5 * cos(2 * t) - 2 * cos(3 * t) - cos(4 * t)] * ${roundness}<br>
+                (x(t), y(t)) = (
+                ${width} * 16 * sin(t)<sup>3</sup> * ${slimness}, 
+                ${height} * [13 * cos(t) - 5 * cos(2 * t) - 2 * cos(3 * t) - cos(4 * t)] * ${roundness})<br>
                 <br>
                 <strong>Parameters:</strong><br>
                 Width: ${width}, Height: ${height}, Slimness: ${slimness}, Roundness: ${roundness}
             `;
+        }
+
+        function drawGrid(ctx) {
+            const gridSize = 25;
+            ctx.clearRect(0, 0, 500, 500);
+            ctx.strokeStyle = "#ddd";
+            ctx.lineWidth = 1;
+
+            for (let x = gridSize; x < 500; x += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, 500);
+                ctx.stroke();
+            }
+
+            for (let y = gridSize; y < 500; y += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(500, y);
+                ctx.stroke();
+            }
         }
 
         function getHeartEquation(width, height, slimness, roundness) {
