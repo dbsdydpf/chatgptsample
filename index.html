@@ -3,84 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shape Plotter</title>
+    <title>Customizable Heart Plotter</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             text-align: center;
-            background-color: #f0f0f0;
+            background: linear-gradient(to bottom, #ff9a9e, #fad0c4);
             margin: 0;
             padding: 20px;
         }
 
-        #input-container {
+        h1 {
+            color: #fff;
+            font-size: 3em;
             margin-bottom: 20px;
+        }
+
+        #input-container {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input[type="number"] {
+            width: 100px;
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #ff6f91;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #ff3e73;
         }
 
         #plot-container {
             display: inline-block;
-            border: 1px solid #ccc;
-            background-color: #fff;
+            margin-top: 20px;
         }
 
         canvas {
-            margin-top: 10px;
             background-color: #fff;
+            border: 2px solid #ff6f91;
+            border-radius: 10px;
+        }
+
+        #equation-output {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            color: #333;
+            font-size: 1.1em;
+            text-align: left;
+            max-width: 500px;
+            margin: 20px auto;
+            line-height: 1.5;
         }
     </style>
 </head>
 <body>
-    <h1>Shape Plotter</h1>
+    <h1>Customizable Heart Plotter</h1>
     <div id="input-container">
-        <label for="shape-input">Enter shape (e.g., clover, heart):</label>
-        <input type="text" id="shape-input" placeholder="Enter shape">
         <label for="width-input">Width:</label>
-        <input type="number" id="width-input" placeholder="Enter width" value="1">
+        <input type="number" id="width-input" value="1" step="0.1">
+        
         <label for="height-input">Height:</label>
-        <input type="number" id="height-input" placeholder="Enter height" value="1">
-        <button onclick="plotShape()">Plot Shape</button>
+        <input type="number" id="height-input" value="1" step="0.1">
+        
+        <label for="slimness-input">Slimness (Narrow or Wide):</label>
+        <input type="number" id="slimness-input" value="1" step="0.1">
+        
+        <label for="roundness-input">Roundness (Flat or Round):</label>
+        <input type="number" id="roundness-input" value="1" step="0.1">
+        
+        <button onclick="plotHeart()">Plot Heart</button>
     </div>
+
     <div id="plot-container">
         <canvas id="plot" width="500" height="500"></canvas>
     </div>
+
+    <div id="equation-output"></div>
+
     <script>
-        function plotShape() {
-            const shape = document.getElementById("shape-input").value.toLowerCase();
+        function plotHeart() {
             const width = parseFloat(document.getElementById("width-input").value);
             const height = parseFloat(document.getElementById("height-input").value);
-            const ctx = document.getElementById("plot").getContext("2d");
+            const slimness = parseFloat(document.getElementById("slimness-input").value);
+            const roundness = parseFloat(document.getElementById("roundness-input").value);
 
+            const ctx = document.getElementById("plot").getContext("2d");
             ctx.clearRect(0, 0, 500, 500);
             ctx.beginPath();
 
-            const equation = getShapeEquation(shape, width, height);
+            const equation = getHeartEquation(width, height, slimness, roundness);
 
-            if (equation) {
-                for (let t = 0; t < 2 * Math.PI; t += 0.01) {
-                    const [x, y] = equation(t);
-                    ctx.lineTo(x + 250, -y + 250);
-                }
-                ctx.stroke();
-            } else {
-                alert("Shape not recognized. Try 'clover' or 'heart'.");
+            for (let t = 0; t < 2 * Math.PI; t += 0.01) {
+                const [x, y] = equation(t);
+                ctx.lineTo(x + 250, -y + 250);
             }
+            ctx.strokeStyle = "#ff3e73";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            document.getElementById("equation-output").innerHTML = `
+                <strong>Heart Equation:</strong><br>
+                x(t) = ${width} * 16 * sin(t)<sup>3</sup> * ${slimness}<br>
+                y(t) = ${height} * [13 * cos(t) - 5 * cos(2 * t) - 2 * cos(3 * t) - cos(4 * t)] * ${roundness}<br>
+                <br>
+                <strong>Parameters:</strong><br>
+                Width: ${width}, Height: ${height}, Slimness: ${slimness}, Roundness: ${roundness}
+            `;
         }
 
-        function getShapeEquation(shape, width, height) {
-            if (shape === "clover") {
-                return (t) => {
-                    const x = width * 16 * Math.sin(t) ** 3;
-                    const y = height * 16 * Math.cos(t) - 4 * Math.cos(2 * t) - Math.cos(3 * t) - Math.cos(4 * t);
-                    return [x * 10, y * 10];
-                };
-            } else if (shape === "heart") {
-                return (t) => {
-                    const x = width * 16 * Math.pow(Math.sin(t), 3);
-                    const y = height * (13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
-                    return [x * 10, y * 10];
-                };
-            }
-            return null;
+        function getHeartEquation(width, height, slimness, roundness) {
+            return (t) => {
+                const x = width * 16 * Math.pow(Math.sin(t), 3) * slimness;
+                const y = height * (13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)) * roundness;
+                return [x * 10, y * 10];
+            };
         }
     </script>
 </body>
