@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shape Plotter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+
+        #input-container {
+            margin-bottom: 20px;
+        }
+
+        #plot-container {
+            display: inline-block;
+            border: 1px solid #ccc;
+            background-color: #fff;
+        }
+
+        canvas {
+            margin-top: 10px;
+            background-color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <h1>Shape Plotter</h1>
+    <div id="input-container">
+        <label for="shape-input">Enter shape (e.g., clover, heart):</label>
+        <input type="text" id="shape-input" placeholder="Enter shape">
+        <label for="width-input">Width:</label>
+        <input type="number" id="width-input" placeholder="Enter width" value="1">
+        <label for="height-input">Height:</label>
+        <input type="number" id="height-input" placeholder="Enter height" value="1">
+        <button onclick="plotShape()">Plot Shape</button>
+    </div>
+    <div id="plot-container">
+        <canvas id="plot" width="500" height="500"></canvas>
+    </div>
+    <script>
+        function plotShape() {
+            const shape = document.getElementById("shape-input").value.toLowerCase();
+            const width = parseFloat(document.getElementById("width-input").value);
+            const height = parseFloat(document.getElementById("height-input").value);
+            const ctx = document.getElementById("plot").getContext("2d");
+
+            ctx.clearRect(0, 0, 500, 500);
+            ctx.beginPath();
+
+            const equation = getShapeEquation(shape, width, height);
+
+            if (equation) {
+                for (let t = 0; t < 2 * Math.PI; t += 0.01) {
+                    const [x, y] = equation(t);
+                    ctx.lineTo(x + 250, -y + 250);
+                }
+                ctx.stroke();
+            } else {
+                alert("Shape not recognized. Try 'clover' or 'heart'.");
+            }
+        }
+
+        function getShapeEquation(shape, width, height) {
+            if (shape === "clover") {
+                return (t) => {
+                    const x = width * 16 * Math.sin(t) ** 3;
+                    const y = height * 16 * Math.cos(t) - 4 * Math.cos(2 * t) - Math.cos(3 * t) - Math.cos(4 * t);
+                    return [x * 10, y * 10];
+                };
+            } else if (shape === "heart") {
+                return (t) => {
+                    const x = width * 16 * Math.pow(Math.sin(t), 3);
+                    const y = height * (13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+                    return [x * 10, y * 10];
+                };
+            }
+            return null;
+        }
+    </script>
+</body>
+</html>
